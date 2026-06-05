@@ -552,7 +552,7 @@ func BinarySearch() {
 }
 
 
-func InsertionSortPinjaman(arr *[1000]Pinjaman, n int) {
+func InsertionSortPinjamanAscending(arr *dataPeminjam, n int) {
 	if n <= 1 {
 		return
 	}
@@ -562,8 +562,8 @@ func InsertionSortPinjaman(arr *[1000]Pinjaman, n int) {
 		var ins,t int
 		ins = sub + 1
 		t = sub
-		if t >= 0 && arr[ins].JumlahPinjaman < arr[t].JumlahPinjaman {
-			arr[ins],arr[t] = arr[t],arr[ins]
+		for t >= 0 && (*arr)[ins].JumlahPinjaman < (*arr)[t].JumlahPinjaman {
+			(*arr)[ins],(*arr)[t] = (*arr)[t],(*arr)[ins]
 			ins--
 			t--
 		}
@@ -571,7 +571,7 @@ func InsertionSortPinjaman(arr *[1000]Pinjaman, n int) {
 	}
 }
 
-func InsertionSortTenor(arr *[1000]Pinjaman, n int) {
+func InsertionSortPinjamanDescending(arr *dataPeminjam,n int) {
 	if n <= 1 {
 		return
 	}
@@ -581,8 +581,8 @@ func InsertionSortTenor(arr *[1000]Pinjaman, n int) {
 		var ins,t int
 		ins = sub + 1
 		t = sub
-		if t >= 0 && arr[ins].Tenor < arr[t].Tenor {
-			arr[ins],arr[t] = arr[t],arr[ins]
+		for t >= 0 && (*arr)[ins].JumlahPinjaman > (*arr)[t].JumlahPinjaman {
+			(*arr)[ins],(*arr)[t] = (*arr)[t],(*arr)[ins]
 			ins--
 			t--
 		}
@@ -590,17 +590,73 @@ func InsertionSortTenor(arr *[1000]Pinjaman, n int) {
 	}
 }
 
-func InsertionSortNama(arr *[1000]Pinjaman, n int) {
+func InsertionSortTenorAscending(arr *dataPeminjam, n int) {
+	if n <= 1 {
+		return
+	}
+	var sub int
+	sub = 0
+	for sub < n - 1 {
+		var ins,t int
+		ins = sub + 1
+		t = sub
+		for t >= 0 && (*arr)[ins].Tenor < (*arr)[t].Tenor {
+			(*arr)[ins],(*arr)[t] = (*arr)[t],(*arr)[ins]
+			ins--
+			t--
+		}
+		sub++
+	}
+}
+
+func InsertionSortTenorDescending(arr *dataPeminjam,n int) {
+	if n <= 1 {
+		return
+	}
+	var sub int
+	sub = 0
+	for sub < n - 1 {
+		var ins,t int
+		ins = sub + 1
+		t = sub
+		for t >= 0 && (*arr)[ins].Tenor > (*arr)[t].Tenor {
+			(*arr)[ins],(*arr)[t] = (*arr)[t],(*arr)[ins]
+			ins--
+			t--
+		}
+		sub++
+	}
+}
+
+func InsertionSortNamaAscending(arr *dataPeminjam, n int) {
 	if n <=1 {
 		return
 	}
 	var sub int
 	for sub < n - 1 {
 		var ins,t int
-		ins = 0
+		ins = sub + 1
 		t = 0
-		for t >= 0 && arr[ins].Nama < arr[t].Nama {
-			arr[ins],arr[t] = arr[t],arr[ins]
+		for t >= 0 && (*arr)[ins].Nama < (*arr)[t].Nama {
+			(*arr)[ins],(*arr)[t] = (*arr)[t],(*arr)[ins]
+			ins--
+			t--
+		}
+		sub++
+	}
+}
+
+func InsertionSortNamaDescendig(arr *dataPeminjam,n int) {
+	if n <= 1 {
+		return
+	}
+	var sub int
+	for sub < n - 1 {
+		var ins,t int
+		ins = sub + 1
+		t = sub
+		for t >= 0 && (*arr)[ins].Nama > (*arr)[t].Nama {
+			(*arr)[ins],(*arr)[t] = (*arr)[t],(*arr)[ins]
 			ins--
 			t--
 		}
@@ -609,7 +665,7 @@ func InsertionSortNama(arr *[1000]Pinjaman, n int) {
 }
 
 //mendapatkan minimum index untuk algoritma selection sort
-func GetMinIdx(arr *dataPeminjam,n int)int {
+func GetMinIdx1(arr *dataPeminjam,n int)int {
 	var min,idx,i int
 	min = int(arr[0].JumlahPinjaman)
 	idx = 0
@@ -623,25 +679,82 @@ func GetMinIdx(arr *dataPeminjam,n int)int {
 	return idx
 }
 
-func SelectionSortPinjaman(arr *dataPeminjam, n int) {
+func GetMaxIdx1(arr *dataPeminjam,n int)int {
+	var max,idx,i int
+	max = int(arr[0].JumlahPinjaman)
+	idx = 0
+	for i = 0;i < n;i++ {
+		if int((*arr)[i].JumlahPinjaman) > max {
+			max = int((*arr)[i].JumlahPinjaman)
+			idx = i
+		}
+	}
+	return idx
+}
+
+func GetMinIdx2(arr *dataPeminjam,n int)int {
+	var min,idx,i int
+	min = int((*arr)[0].Tenor)
+	idx = 0
+	for i = 0;i < n;i++ {
+		if int((*arr)[i].Tenor) < min {
+			min = int((*arr)[i].Tenor)
+			idx = i
+		}
+	}
+	return idx
+}
+
+func GetMaxIdx2(arr *dataPeminjam,n int)int {
+	var max,idx,i int
+	max = int((*arr)[0].Tenor)
+	idx = 0
+	for i = 0;i < n;i++ {
+		if int((*arr)[i].Tenor) > max {
+			max = int((*arr)[i].Tenor)
+			idx = i
+		}
+	}
+	return idx
+}
+
+func SelectionSortPinjamanAscending(arr *dataPeminjam, n int) {
 	var idx int
 	for idx < n - 1 {
 		var minIdx int
-		minIdx = GetMinIdx(arr,n) + idx
+		minIdx = GetMinIdx1(arr,n) + idx
 		arr[idx],arr[minIdx] = arr[minIdx],arr[idx]	
 		idx++
 	}
 }
 
-func SelectionSortTenor(arr *dataPeminjam, n int) {
-	for i := 1; i < n-1; i++ {
-		minIdx := i
-		for j := i + 1; j < n; j++ {
-			if arr[j].Tenor < arr[minIdx].Tenor {
-				minIdx = j
-			}
-		}
-		arr[i], arr[minIdx] = arr[minIdx], arr[i]
+func SelectionSortPinjamanDescending(arr *dataPeminjam,n int) {
+	var idx int
+	for idx < n - 1 {
+		var maxIdx int
+		maxIdx = GetMaxIdx1(arr,n) + idx
+		arr[idx],arr[maxIdx] = arr[maxIdx],arr[idx]
+		idx++
+	}
+}
+
+func SelectionSortTenorAscending(arr *dataPeminjam, n int) {
+	var idx int
+	for idx < n - 1 {
+		var minIdx int
+		minIdx = GetMinIdx2(arr,n) + idx
+		arr[idx],arr[minIdx] = arr[minIdx],arr[idx]
+		idx++
+	}
+}
+
+func SelectionSortTenorDescending(arr *dataPeminjam,n int) {
+	var idx int
+	for idx < n - 1  {
+		var maxIdx int
+		maxIdx = GetMaxIdx2(arr,n) + idx
+		arr[idx],arr[maxIdx] = arr[maxIdx],arr[idx]
+		idx++
 	}
 }
 
@@ -694,6 +807,7 @@ func MenuSorting() {
 	fmt.Println("    2. Tenor           (Selection Sort)")
 	fmt.Println("    3. Jumlah Pinjaman (Insertion Sort)")
 	fmt.Println("    4. Tenor           (Insertion Sort)")
+	fmt.Println("	 5. Nama			(Insertion Sort)")
 	fmt.Print("  Pilihan : ")
 
 	var pil string
@@ -701,17 +815,85 @@ func MenuSorting() {
 
 	switch pil {
 	case "1":
-		SelectionSortPinjaman(&arrPeminjam, countPeminjam)
-		fmt.Println("  Data diurutkan berdasarkan Jumlah Pinjaman (Selection Sort).")
+		fmt.Println("Mau Mengurutkan jumlah Pinjaman dari apa dulu nih : ")
+		fmt.Println("1.	Ascending(Terkecil->Terbesar)")
+		fmt.Println("2.	Descending(Terbesar->Terkecil)")
+		var pi string
+		fmt.Scan(&pi)
+		switch pi {
+		case "1":
+			SelectionSortPinjamanAscending(&arrPeminjam,countPeminjam)
+			fmt.Println("Data diurutkan berdasarkan Pinjaman Terkecil ke Terbesar (Ascending).")
+		case "2":
+			SelectionSortPinjamanDescending(&arrPeminjam,countPeminjam)
+			fmt.Println("Data diurutkan berdasarkan jumlah pinjaman Terbesar ke Terkecil (Descending).")
+		default:
+			fmt.Println("	Error! Pilihan anda tidak valid.")
+		}
 	case "2":
-		SelectionSortTenor(&dataPeminjam, countPeminjam)
-		fmt.Println("  Data diurutkan berdasarkan Tenor (Selection Sort).")
+		fmt.Println("Mau mengurutkan jumlah Tenor dari apa dulu nih : ")
+		fmt.Println("1.	Ascending(Terkecil->Terbesar)")
+		fmt.Println("2.	Descending(Terbesar->Terkecil)")
+		var pi string
+		fmt.Scan(&pi)
+		switch pi {
+		case "1":
+			SelectionSortTenorAscending(&arrPeminjam,countPeminjam)
+			fmt.Println("Data diurutkan berdasarkan jumlah Tenor Terkecil ke Terbesar(Ascending).")
+		case "2":
+			SelectionSortTenorDescending(&arrPeminjam,countPeminjam)
+			fmt.Println("Data diurutkan berdasarkan jumlah Tenor Terbesar ke Terkecil (Descending).")
+		default:
+			fmt.Println("	Error! Pilihan anda tidak valid.")
+		}
 	case "3":
-		InsertionSortPinjaman(&dataPeminjam, countPeminjam)
-		fmt.Println("  Data diurutkan berdasarkan Jumlah Pinjaman (Insertion Sort).")
+		fmt.Println("Mau Mengurutkan jumlah Pinjaman dari apa dulu nih : ")
+		fmt.Println("1.	Ascending(Terkecil->Terbesar)")
+		fmt.Println("2.	Descending(Terbesar->Terkecil)")
+		var pi string
+		fmt.Scan(&pi)
+		switch pi {
+		case "1":
+			InsertionSortPinjamanAscending(&arrPeminjam,countPeminjam)
+			fmt.Println("Data diurutkan berdasarkan jumlah pinjaman Terkecil ke Terbesar(Ascending).")
+		case "2":
+			InsertionSortPinjamanDescending(&arrPeminjam,countPeminjam)
+			fmt.Println("Data diurutkan berdasarkan jumlah pinjaman Terbesar ke Terkecil(Descending).")
+		default:
+			fmt.Println("	Error! Pilihan anda tidak valid.")
+		}
 	case "4":
-		InsertionSortTenor(&dataPeminjam, countPeminjam)
-		fmt.Println("  Data diurutkan berdasarkan Tenor (Insertion Sort).")
+		fmt.Println("Mau mengurutkan jumlah Tenor dari apa dulu nih : ")
+		fmt.Println("1.	Ascending(Terkecil->Terbesar)")
+		fmt.Println("2.	Descending(Terbesar->Terkecil)")
+		var pi string
+		fmt.Scan(&pi)
+		switch pi {
+		case "1":
+			InsertionSortTenorAscending(&arrPeminjam,countPeminjam)
+			fmt.Println("Data diurutkan berdasarkan jumlah Tenor Terkecil ke Terbesar(Ascending).")
+		case "2":
+			InsertionSortNamaDescendig(&arrPeminjam,countPeminjam)
+			fmt.Println("Data diurutkan berdasarkan jumlah Tenor Terbesar ke Terkecil (Descending).")
+		default:
+			fmt.Println("	Error! Pilihan anda tidak valid!")
+		}
+	case "5":
+		fmt.Println("Mau mengurutkan Nama dari apa dulu nih : ")
+		fmt.Println("1.	Ascending(A->Z)")
+		fmt.Println("2.	Descending(Z->A)")
+		var pi string
+		fmt.Scan(&pi)
+		switch pi {
+		case "1":
+			InsertionSortNamaAscending(&arrPeminjam,countPeminjam)
+			fmt.Println("Data diurutkan berdasarkan Nama dari A ke Z(Ascending).")
+		case "2":
+			InsertionSortNamaDescendig(&arrPeminjam,countPeminjam)
+			fmt.Println("Data diurutkan berdasarkan Nama dari Z ke A(Descending).")
+		default:
+			fmt.Println("	Error! Pilihan anda tidak valid!")
+		}
 	default:
 		fmt.Println("  Error! Pilihan tidak valid.")
 		enter()
@@ -737,7 +919,7 @@ func Laporan() {
 	var cMen, cAk, cLun, cMcet int
 
 	for i := 0; i < countPeminjam; i++ {
-		p := dataPeminjam[i]
+		p := arrPeminjam[i]
 		totalPokok += p.JumlahPinjaman
 		totalBayar += p.TotalBayar
 		totalBunga += p.TotalBunga
