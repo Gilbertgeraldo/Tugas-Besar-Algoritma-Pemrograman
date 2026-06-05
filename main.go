@@ -3,7 +3,7 @@ import (
 	"fmt"
 	"math"
 )
-
+const MAXVAL int = 1000
 type Pinjaman struct {
 	Nama            string
 	JumlahPinjaman  float64
@@ -19,7 +19,9 @@ type Pinjaman struct {
 	SudahBayar      int
 }
 
-var dataPeminjam [1000]Pinjaman
+type dataPeminjam [MAXVAL]Pinjaman
+
+var arrPeminjam dataPeminjam
 var countPeminjam int = 0
 
 func ClearScreen() {
@@ -71,7 +73,7 @@ func allTable() {
 	}
 	TabelHeader()
 	for i := 0; i < countPeminjam; i++ {
-		TabelBaris(dataPeminjam[i], i)
+		TabelBaris(arrPeminjam[i], i)
 	}
 	garis1()
 	fmt.Printf("  Total : %d peminjam\n", countPeminjam)
@@ -214,7 +216,7 @@ func tambahPeminjam() {
 	p.Status = "MENUNGGU"
 	p.sudahBayar = 0
 
-	dataPeminjam[countPeminjam] = p
+	arrPeminjam[countPeminjam] = p
 	countPeminjam++
 
 	fmt.Println("\n  === HASIL KALKULASI ===")
@@ -252,7 +254,7 @@ func ubahPeminjam() {
 	}
 
 	idx := no - 1
-	p := &dataPeminjam[idx]
+	p := &arrPeminjam[idx]
 
 	fmt.Println("\n  Data saat ini:")
 	DetailPeminjaman(*p, idx)
@@ -339,7 +341,7 @@ func hapusPeminjam() {
 	}
 
 	idx := no - 1
-	nama := dataPeminjam[idx].Nama
+	nama := arrPeminjam[idx].Nama
 
 	fmt.Printf("  Apakah anda yakin untuk menghapus \"%s\"? (Y/N) : ", nama)
 	var konfirmasi string
@@ -351,7 +353,7 @@ func hapusPeminjam() {
 	}
 
 	for i := idx; i < countPeminjam-1; i++ {
-		dataPeminjam[i] = dataPeminjam[i+1]
+		arrPeminjam[i] = arrPeminjam[i+1]
 	}
 	countPeminjam--
 	fmt.Printf("  Peminjam \"%s\" berhasil dihapus!\n", nama)
@@ -385,8 +387,8 @@ func SequentialSearch() {
 
 	for i := 0; i < countPeminjam; i++ {
 		namaLower := ""
-		for j := 0; j < len(dataPeminjam[i].Nama); j++ {
-			c := dataPeminjam[i].Nama[j]
+		for j := 0; j < len(arrPeminjam[i].Nama); j++ {
+			c := arrPeminjam[i].Nama[j]
 			if c >= 'A' && c <= 'Z' {
 				c = c + 32
 			}
@@ -405,7 +407,7 @@ func SequentialSearch() {
 		}
 
 		if match {
-			DetailPeminjaman(dataPeminjam[i], i)
+			DetailPeminjaman(arrPeminjam[i], i)
 			found = true
 		}
 	}
@@ -423,7 +425,7 @@ func BinarySearch() {
 
 	var temp [1000]Pinjaman
 	for i := 0; i < countPeminjam; i++ {
-		temp[i] = dataPeminjam[i]
+		temp[i] = arrPeminjam[i]
 	}
 
 	for i := 1; i < countPeminjam; i++ {
@@ -551,54 +553,87 @@ func BinarySearch() {
 
 
 func InsertionSortPinjaman(arr *[1000]Pinjaman, n int) {
-	for i := 0; i < n; i++ {
-		key := arr[i]
-		j := i - 1
-		for j >= 0 && arr[j].JumlahPinjaman > key.JumlahPinjaman {
-			arr[j+1] = arr[j]
-			j--
+	if n <= 1 {
+		return
+	}
+	var sub int
+	sub = 0
+	for sub < n - 1 {
+		var ins,t int
+		ins = sub + 1
+		t = sub
+		if t >= 0 && arr[ins].JumlahPinjaman < arr[t].JumlahPinjaman {
+			arr[ins],arr[t] = arr[t],arr[ins]
+			ins--
+			t--
 		}
-		arr[j+1] = key
+		sub++
 	}
 }
 
 func InsertionSortTenor(arr *[1000]Pinjaman, n int) {
-	for i := 1; i < n; i++ {
-		key := arr[i]
-		j := i - 1
-		for j >= 0 && arr[j].Tenor > key.Tenor {
-			arr[j+1] = arr[j]
-			j--
+	if n <= 1 {
+		return
+	}
+	var sub int
+	sub = 0
+	for sub < n - 1 {
+		var ins,t int
+		ins = sub + 1
+		t = sub
+		if t >= 0 && arr[ins].Tenor < arr[t].Tenor {
+			arr[ins],arr[t] = arr[t],arr[ins]
+			ins--
+			t--
 		}
-		arr[j+1] = key
+		sub++
 	}
 }
 
 func InsertionSortNama(arr *[1000]Pinjaman, n int) {
-	for i := 1; i < n; i++ {
-		key := arr[i]
-		j := i - 1
-		for j >= 0 && arr[j].Nama > key.Nama {
-			arr[j+1] = arr[j]
-			j--
+	if n <=1 {
+		return
+	}
+	var sub int
+	for sub < n - 1 {
+		var ins,t int
+		ins = 0
+		t = 0
+		for t >= 0 && arr[ins].Nama < arr[t].Nama {
+			arr[ins],arr[t] = arr[t],arr[ins]
+			ins--
+			t--
 		}
-		arr[j+1] = key
+		sub++
 	}
 }
 
-func SelectionSortPinjaman(arr *[1000]Pinjaman, n int) {
-	for i := 1; i < n-1; i++ {
-		mIdx := i
-		for j := i + 1; j < n; j++ {
-			if arr[j].JumlahPinjaman < arr[mIdx].JumlahPinjaman {
-				mIdx = j
-			}
+//mendapatkan minimum index untuk algoritma selection sort
+func GetMinIdx(arr *dataPeminjam,n int)int {
+	var min,idx,i int
+	min = int(arr[0].JumlahPinjaman)
+	idx = 0
+	for i = 0;i < n;i++ { // akan looping sebanyak n kali untuk cek semua data jumlah peminjaman yang ada
+		if int((*arr)[i].JumlahPinjaman) < min { //akan di tes satu persatu dari data pinjaman,untuk menemukan min value nya
+			min = int((*arr)[i].JumlahPinjaman) // jika sudah ketemu maka akan berubah nilai min nya, math.MaxInt -> arr[i].JumlahPinjaman
+			//karena dalam struct Pinjaman,tipe data dari JumlahPinjaman adalah float64,maka kita akan return nya sebagai int
+			idx = i // mengembalikan indeks yang valuenya adalah JumlahPinjaman
 		}
-		arr[i], arr[mIdx] = arr[mIdx], arr[i]
+	}
+	return idx
+}
+
+func SelectionSortPinjaman(arr *dataPeminjam, n int) {
+	var idx int
+	for idx < n - 1 {
+		var minIdx int
+		minIdx = GetMinIdx(arr,n) + idx
+		arr[idx],arr[minIdx] = arr[minIdx],arr[idx]	
+		idx++
 	}
 }
 
-func SelectionSortTenor(arr *[1000]Pinjaman, n int) {
+func SelectionSortTenor(arr *dataPeminjam, n int) {
 	for i := 1; i < n-1; i++ {
 		minIdx := i
 		for j := i + 1; j < n; j++ {
@@ -666,7 +701,7 @@ func MenuSorting() {
 
 	switch pil {
 	case "1":
-		SelectionSortPinjaman(&dataPeminjam, countPeminjam)
+		SelectionSortPinjaman(&arrPeminjam, countPeminjam)
 		fmt.Println("  Data diurutkan berdasarkan Jumlah Pinjaman (Selection Sort).")
 	case "2":
 		SelectionSortTenor(&dataPeminjam, countPeminjam)
