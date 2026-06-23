@@ -1,9 +1,12 @@
 package main
+
 import (
 	"fmt"
 	"math"
 )
+
 const MAXVAL int = 1000
+
 type Pinjaman struct {
 	Nama            string
 	JumlahPinjaman  float64
@@ -131,7 +134,7 @@ func hitungDanSet(p *Pinjaman) {
 
 // Rumus Tabel Amortisasi
 // - Angsuran Bunga = Sisa Pokok × Suku Bunga Bulanan
-// - Angsuran Pokok = Total Angsuran - Angsuran Bunga  
+// - Angsuran Pokok = Total Angsuran - Angsuran Bunga
 // - Sisa Pokok     = Sisa Pokok Bulan Lalu - Angsuran Pokok
 // didapat dari: https://kledo.com/blog/rumus-kalkulator-amortisasi/
 func cetakAmortisasi(p Pinjaman) {
@@ -292,32 +295,32 @@ func ubahPeminjam() {
 		}
 		hitungDanSet(p)
 	case "5":
-    fmt.Println("  Pilih status :")
-    fmt.Println("    1. MENUNGGU")
-    fmt.Println("    2. AKTIF")
-    fmt.Println("    3. LUNAS")
-    fmt.Println("    4. MACET")
-    fmt.Print("  Pilihan : ")
-    var sp string
-    fmt.Scan(&sp)
-    switch sp {
-    case "1":
-        p.Status = "MENUNGGU"
-    case "2":
-        p.Status = "AKTIF"
-    case "3":
-        p.Status = "LUNAS"
-    case "4":
-        p.Status = "MACET"
-    default:
-        fmt.Println("  Pilihan tidak valid.")
-    }
+		fmt.Println("  Pilih status :")
+		fmt.Println("    1. MENUNGGU")
+		fmt.Println("    2. AKTIF")
+		fmt.Println("    3. LUNAS")
+		fmt.Println("    4. MACET")
+		fmt.Print("  Pilihan : ")
+		var sp string
+		fmt.Scan(&sp)
+		switch sp {
+		case "1":
+			p.Status = "MENUNGGU"
+		case "2":
+			p.Status = "AKTIF"
+		case "3":
+			p.Status = "LUNAS"
+		case "4":
+			p.Status = "MACET"
+		default:
+			fmt.Println("  Pilihan tidak valid.")
+		}
 
-	fmt.Printf("\n  Data peminjam \"%s\" berhasil diubah!\n", p.Nama)
-	DetailPeminjaman(*p, idx)
-	enter()
+		fmt.Printf("\n  Data peminjam \"%s\" berhasil diubah!\n", p.Nama)
+		DetailPeminjaman(*p, idx)
+		enter()
 	}
-}	
+}
 
 func hapusPeminjam() {
 	ClearScreen()
@@ -358,7 +361,6 @@ func hapusPeminjam() {
 	countPeminjam--
 	fmt.Printf("  Peminjam \"%s\" berhasil dihapus!\n", nama)
 }
-
 
 func SequentialSearch() {
 	if countPeminjam == 0 {
@@ -551,19 +553,13 @@ func BinarySearch() {
 	}
 }
 
-
-func InsertionSortPinjamanAscending(arr *dataPeminjam, n int) {
-	if n <= 1 {
-		return
-	}
-	var sub int
-	sub = 0
-	for sub < n - 1 {
-		var ins,t int
-		ins = sub + 1
-		t = sub
-		for t >= 0 && (*arr)[ins].JumlahPinjaman < (*arr)[t].JumlahPinjaman {
-			(*arr)[ins],(*arr)[t] = (*arr)[t],(*arr)[ins]
+func InsertionSort(arr *dataPeminjam, n int, fieldName string, isAscending bool) {
+	sub := 0
+	for sub < n-1 {
+		ins := sub + 1
+		t := sub
+		for t >= 0 && Swap(arr, ins, t, fieldName, isAscending) {
+			arr[ins], arr[t] = arr[t], arr[ins]
 			ins--
 			t--
 		}
@@ -571,193 +567,171 @@ func InsertionSortPinjamanAscending(arr *dataPeminjam, n int) {
 	}
 }
 
-func InsertionSortPinjamanDescending(arr *dataPeminjam,n int) {
-	if n <= 1 {
+func selectionSort(arr *dataPeminjam, n int, fieldName string, isAscending bool) {
+	for i := 0; i < n-1; i++ {
+		minIdx := i
+		for j := i + 1; j < n; j++ {
+			if Swap(arr, j, minIdx, fieldName, isAscending) {
+				minIdx = j
+			}
+		}
+		arr[i], arr[minIdx] = arr[minIdx], arr[i]
+	}
+}
+
+func Swap(arr *dataPeminjam, ins, t int, fieldName string, isAscending bool) bool {
+	var status bool
+	switch fieldName {
+	case "Pinjaman":
+		status = arr[ins].JumlahPinjaman < arr[t].JumlahPinjaman
+	case "Tenor":
+		status = arr[ins].Tenor < arr[t].Tenor
+	case "Nama":
+		status = arr[ins].Nama < arr[t].Nama
+	default:
+		return false
+	}
+	if isAscending {
+		return status
+	} else {
+		return !status
+	}
+}
+
+func MenuSorting() {
+	ClearScreen()
+	garis1()
+	fmt.Println("  URUTKAN DATA PEMINJAM")
+	garis1()
+
+	if countPeminjam == 0 {
+		fmt.Println("  Belum ada data peminjam!")
+		enter()
 		return
 	}
-	var sub int
-	sub = 0
-	for sub < n - 1 {
-		var ins,t int
-		ins = sub + 1
-		t = sub
-		for t >= 0 && (*arr)[ins].JumlahPinjaman > (*arr)[t].JumlahPinjaman {
-			(*arr)[ins],(*arr)[t] = (*arr)[t],(*arr)[ins]
-			ins--
-			t--
-		}
-		sub++
-	}
-}
 
-func InsertionSortTenorAscending(arr *dataPeminjam, n int) {
-	if n <= 1 {
+	fmt.Println("  Urutkan berdasarkan :")
+	fmt.Println("    1. Jumlah Pinjaman (Selection Sort)")
+	fmt.Println("    2. Tenor           (Selection Sort)")
+	fmt.Println("    3. Jumlah Pinjaman (Insertion Sort)")
+	fmt.Println("    4. Tenor           (Insertion Sort)")
+	fmt.Println("	 5. Nama			(Insertion Sort)")
+	fmt.Println("	 6. Nama			(Selection Sort)")
+
+	fmt.Print("  Pilihan : ")
+
+	var pil string
+	fmt.Scan(&pil)
+
+	switch pil {
+	case "1":
+		fmt.Println("Mau Mengurutkan jumlah Pinjaman dari apa dulu nih : ")
+		fmt.Println("1.	Ascending(Terkecil->Terbesar)")
+		fmt.Println("2.	Descending(Terbesar->Terkecil)")
+		var pi string
+		fmt.Scan(&pi)
+		switch pi {
+		case "1":
+			selectionSort(&arrPeminjam, countPeminjam, "Pinjaman", true)
+			fmt.Println("Data diurutkan berdasarkan Pinjaman Terkecil ke Terbesar (Ascending).")
+		case "2":
+			selectionSort(&arrPeminjam, countPeminjam, "Pinjaman", false)
+			fmt.Println("Data diurutkan berdasarkan jumlah pinjaman Terbesar ke Terkecil (Descending).")
+		default:
+			fmt.Println("	Error! Pilihan anda tidak valid.")
+		}
+	case "2":
+		fmt.Println("Mau mengurutkan jumlah Tenor dari apa dulu nih : ")
+		fmt.Println("1.	Ascending(Terkecil->Terbesar)")
+		fmt.Println("2.	Descending(Terbesar->Terkecil)")
+		var pi string
+		fmt.Scan(&pi)
+		switch pi {
+		case "1":
+			selectionSort(&arrPeminjam, countPeminjam, "Tenor", true)
+			fmt.Println("Data diurutkan berdasarkan jumlah Tenor Terkecil ke Terbesar(Ascending).")
+		case "2":
+			selectionSort(&arrPeminjam, countPeminjam, "Tenor", false)
+			fmt.Println("Data diurutkan berdasarkan jumlah Tenor Terbesar ke Terkecil (Descending).")
+		default:
+			fmt.Println("	Error! Pilihan anda tidak valid.")
+		}
+	case "3":
+		fmt.Println("Mau Mengurutkan jumlah Pinjaman dari apa dulu nih : ")
+		fmt.Println("1.	Ascending(Terkecil->Terbesar)")
+		fmt.Println("2.	Descending(Terbesar->Terkecil)")
+		var pi string
+		fmt.Scan(&pi)
+		switch pi {
+		case "1":
+			InsertionSort(&arrPeminjam, countPeminjam, "Pinjaman", true)
+			fmt.Println("Data diurutkan berdasarkan jumlah pinjaman Terkecil ke Terbesar(Ascending).")
+		case "2":
+			InsertionSort(&arrPeminjam, countPeminjam, "Pinjaman", false)
+			fmt.Println("Data diurutkan berdasarkan jumlah pinjaman Terbesar ke Terkecil(Descending).")
+		default:
+			fmt.Println("	Error! Pilihan anda tidak valid.")
+		}
+	case "4":
+		fmt.Println("Mau mengurutkan jumlah Tenor dari apa dulu nih : ")
+		fmt.Println("1.	Ascending(Terkecil->Terbesar)")
+		fmt.Println("2.	Descending(Terbesar->Terkecil)")
+		var pi string
+		fmt.Scan(&pi)
+		switch pi {
+		case "1":
+			InsertionSort(&arrPeminjam, countPeminjam, "Tenor", true)
+			fmt.Println("Data diurutkan berdasarkan jumlah Tenor Terkecil ke Terbesar(Ascending).")
+		case "2":
+			InsertionSort(&arrPeminjam, countPeminjam, "Tenor", false)
+			fmt.Println("Data diurutkan berdasarkan jumlah Tenor Terbesar ke Terkecil (Descending).")
+		default:
+			fmt.Println("	Error! Pilihan anda tidak valid!")
+		}
+	case "5":
+		fmt.Println("Mau mengurutkan Nama dari apa dulu nih : ")
+		fmt.Println("1.	Ascending(A->Z)")
+		fmt.Println("2.	Descending(Z->A)")
+		var pi string
+		fmt.Scan(&pi)
+		switch pi {
+		case "1":
+			InsertionSort(&arrPeminjam, countPeminjam, "Nama", true)
+
+			fmt.Println("Data diurutkan berdasarkan Nama dari A ke Z(Ascending).")
+		case "2":
+			InsertionSort(&arrPeminjam, countPeminjam, "Nama", false)
+
+			fmt.Println("Data diurutkan berdasarkan Nama dari Z ke A(Descending).")
+		default:
+			fmt.Println("	Error! Pilihan anda tidak valid!")
+		}
+	case "6":
+		fmt.Println("Mau mengurutkan Nama dari apa dulu nih : ")
+		fmt.Println("1.	Ascending(A->Z)")
+		fmt.Println("2.	Descending(Z->A)")
+		var pi string
+		fmt.Scan(&pi)
+		switch pi {
+		case "1":
+			selectionSort(&arrPeminjam, countPeminjam, "Nama", true)
+
+			fmt.Println("Data diurutkan berdasarkan Nama dari A ke Z(Ascending).")
+		case "2":
+			selectionSort(&arrPeminjam, countPeminjam, "Nama", false)
+
+			fmt.Println("Data diurutkan berdasarkan Nama dari Z ke A(Descending).")
+		default:
+			fmt.Println("	Error! Pilihan anda tidak valid!")
+		}
+	default:
+		fmt.Println("  Error! Pilihan tidak valid.")
+		enter()
 		return
 	}
-	var sub int
-	sub = 0
-	for sub < n - 1 {
-		var ins,t int
-		ins = sub + 1
-		t = sub
-		for t >= 0 && (*arr)[ins].Tenor < (*arr)[t].Tenor {
-			(*arr)[ins],(*arr)[t] = (*arr)[t],(*arr)[ins]
-			ins--
-			t--
-		}
-		sub++
-	}
+	allTable()
+	enter()
 }
-
-func InsertionSortTenorDescending(arr *dataPeminjam,n int) {
-	if n <= 1 {
-		return
-	}
-	var sub int
-	sub = 0
-	for sub < n - 1 {
-		var ins,t int
-		ins = sub + 1
-		t = sub
-		for t >= 0 && (*arr)[ins].Tenor > (*arr)[t].Tenor {
-			(*arr)[ins],(*arr)[t] = (*arr)[t],(*arr)[ins]
-			ins--
-			t--
-		}
-		sub++
-	}
-}
-
-func InsertionSortNamaAscending(arr *dataPeminjam, n int) {
-	if n <=1 {
-		return
-	}
-	var sub int
-	for sub < n - 1 {
-		var ins,t int
-		ins = sub + 1
-		t = 0
-		for t >= 0 && (*arr)[ins].Nama < (*arr)[t].Nama {
-			(*arr)[ins],(*arr)[t] = (*arr)[t],(*arr)[ins]
-			ins--
-			t--
-		}
-		sub++
-	}
-}
-
-func InsertionSortNamaDescendig(arr *dataPeminjam,n int) {
-	if n <= 1 {
-		return
-	}
-	var sub int
-	for sub < n - 1 {
-		var ins,t int
-		ins = sub + 1
-		t = sub
-		for t >= 0 && (*arr)[ins].Nama > (*arr)[t].Nama {
-			(*arr)[ins],(*arr)[t] = (*arr)[t],(*arr)[ins]
-			ins--
-			t--
-		}
-		sub++
-	}
-}
-
-//mendapatkan minimum index untuk algoritma selection sort
-func GetMinIdx1(arr *dataPeminjam,n int)int {
-	var min,idx,i int
-	min = int(arr[0].JumlahPinjaman)
-	idx = 0
-	for i = 0;i < n;i++ { // akan looping sebanyak n kali untuk cek semua data jumlah peminjaman yang ada
-		if int((*arr)[i].JumlahPinjaman) < min { //akan di tes satu persatu dari data pinjaman,untuk menemukan min value nya
-			min = int((*arr)[i].JumlahPinjaman) // jika sudah ketemu maka akan berubah nilai min nya, math.MaxInt -> arr[i].JumlahPinjaman
-			//karena dalam struct Pinjaman,tipe data dari JumlahPinjaman adalah float64,maka kita akan return nya sebagai int
-			idx = i // mengembalikan indeks yang valuenya adalah JumlahPinjaman
-		}
-	}
-	return idx
-}
-
-func GetMaxIdx1(arr *dataPeminjam,n int)int {
-	var max,idx,i int
-	max = int(arr[0].JumlahPinjaman)
-	idx = 0
-	for i = 0;i < n;i++ {
-		if int((*arr)[i].JumlahPinjaman) > max {
-			max = int((*arr)[i].JumlahPinjaman)
-			idx = i
-		}
-	}
-	return idx
-}
-
-func GetMinIdx2(arr *dataPeminjam,n int)int {
-	var min,idx,i int
-	min = int((*arr)[0].Tenor)
-	idx = 0
-	for i = 0;i < n;i++ {
-		if int((*arr)[i].Tenor) < min {
-			min = int((*arr)[i].Tenor)
-			idx = i
-		}
-	}
-	return idx
-}
-
-func GetMaxIdx2(arr *dataPeminjam,n int)int {
-	var max,idx,i int
-	max = int((*arr)[0].Tenor)
-	idx = 0
-	for i = 0;i < n;i++ {
-		if int((*arr)[i].Tenor) > max {
-			max = int((*arr)[i].Tenor)
-			idx = i
-		}
-	}
-	return idx
-}
-
-func SelectionSortPinjamanAscending(arr *dataPeminjam, n int) {
-	var idx int
-	for idx < n - 1 {
-		var minIdx int
-		minIdx = GetMinIdx1(arr,n) + idx
-		arr[idx],arr[minIdx] = arr[minIdx],arr[idx]	
-		idx++
-	}
-}
-
-func SelectionSortPinjamanDescending(arr *dataPeminjam,n int) {
-	var idx int
-	for idx < n - 1 {
-		var maxIdx int
-		maxIdx = GetMaxIdx1(arr,n) + idx
-		arr[idx],arr[maxIdx] = arr[maxIdx],arr[idx]
-		idx++
-	}
-}
-
-func SelectionSortTenorAscending(arr *dataPeminjam, n int) {
-	var idx int
-	for idx < n - 1 {
-		var minIdx int
-		minIdx = GetMinIdx2(arr,n) + idx
-		arr[idx],arr[minIdx] = arr[minIdx],arr[idx]
-		idx++
-	}
-}
-
-func SelectionSortTenorDescending(arr *dataPeminjam,n int) {
-	var idx int
-	for idx < n - 1  {
-		var maxIdx int
-		maxIdx = GetMaxIdx2(arr,n) + idx
-		arr[idx],arr[maxIdx] = arr[maxIdx],arr[idx]
-		idx++
-	}
-}
-
 
 func MenuSearching() {
 	ClearScreen()
@@ -787,119 +761,6 @@ func MenuSearching() {
 	default:
 		fmt.Println("  Error! Pilihan tidak valid.")
 	}
-	enter()
-}
-
-func MenuSorting() {
-	ClearScreen()
-	garis1()
-	fmt.Println("  URUTKAN DATA PEMINJAM")
-	garis1()
-
-	if countPeminjam == 0 {
-		fmt.Println("  Belum ada data peminjam!")
-		enter()
-		return
-	}
-
-	fmt.Println("  Urutkan berdasarkan :")
-	fmt.Println("    1. Jumlah Pinjaman (Selection Sort)")
-	fmt.Println("    2. Tenor           (Selection Sort)")
-	fmt.Println("    3. Jumlah Pinjaman (Insertion Sort)")
-	fmt.Println("    4. Tenor           (Insertion Sort)")
-	fmt.Println("	 5. Nama			(Insertion Sort)")
-	fmt.Print("  Pilihan : ")
-
-	var pil string
-	fmt.Scan(&pil)
-
-	switch pil {
-	case "1":
-		fmt.Println("Mau Mengurutkan jumlah Pinjaman dari apa dulu nih : ")
-		fmt.Println("1.	Ascending(Terkecil->Terbesar)")
-		fmt.Println("2.	Descending(Terbesar->Terkecil)")
-		var pi string
-		fmt.Scan(&pi)
-		switch pi {
-		case "1":
-			SelectionSortPinjamanAscending(&arrPeminjam,countPeminjam)
-			fmt.Println("Data diurutkan berdasarkan Pinjaman Terkecil ke Terbesar (Ascending).")
-		case "2":
-			SelectionSortPinjamanDescending(&arrPeminjam,countPeminjam)
-			fmt.Println("Data diurutkan berdasarkan jumlah pinjaman Terbesar ke Terkecil (Descending).")
-		default:
-			fmt.Println("	Error! Pilihan anda tidak valid.")
-		}
-	case "2":
-		fmt.Println("Mau mengurutkan jumlah Tenor dari apa dulu nih : ")
-		fmt.Println("1.	Ascending(Terkecil->Terbesar)")
-		fmt.Println("2.	Descending(Terbesar->Terkecil)")
-		var pi string
-		fmt.Scan(&pi)
-		switch pi {
-		case "1":
-			SelectionSortTenorAscending(&arrPeminjam,countPeminjam)
-			fmt.Println("Data diurutkan berdasarkan jumlah Tenor Terkecil ke Terbesar(Ascending).")
-		case "2":
-			SelectionSortTenorDescending(&arrPeminjam,countPeminjam)
-			fmt.Println("Data diurutkan berdasarkan jumlah Tenor Terbesar ke Terkecil (Descending).")
-		default:
-			fmt.Println("	Error! Pilihan anda tidak valid.")
-		}
-	case "3":
-		fmt.Println("Mau Mengurutkan jumlah Pinjaman dari apa dulu nih : ")
-		fmt.Println("1.	Ascending(Terkecil->Terbesar)")
-		fmt.Println("2.	Descending(Terbesar->Terkecil)")
-		var pi string
-		fmt.Scan(&pi)
-		switch pi {
-		case "1":
-			InsertionSortPinjamanAscending(&arrPeminjam,countPeminjam)
-			fmt.Println("Data diurutkan berdasarkan jumlah pinjaman Terkecil ke Terbesar(Ascending).")
-		case "2":
-			InsertionSortPinjamanDescending(&arrPeminjam,countPeminjam)
-			fmt.Println("Data diurutkan berdasarkan jumlah pinjaman Terbesar ke Terkecil(Descending).")
-		default:
-			fmt.Println("	Error! Pilihan anda tidak valid.")
-		}
-	case "4":
-		fmt.Println("Mau mengurutkan jumlah Tenor dari apa dulu nih : ")
-		fmt.Println("1.	Ascending(Terkecil->Terbesar)")
-		fmt.Println("2.	Descending(Terbesar->Terkecil)")
-		var pi string
-		fmt.Scan(&pi)
-		switch pi {
-		case "1":
-			InsertionSortTenorAscending(&arrPeminjam,countPeminjam)
-			fmt.Println("Data diurutkan berdasarkan jumlah Tenor Terkecil ke Terbesar(Ascending).")
-		case "2":
-			InsertionSortNamaDescendig(&arrPeminjam,countPeminjam)
-			fmt.Println("Data diurutkan berdasarkan jumlah Tenor Terbesar ke Terkecil (Descending).")
-		default:
-			fmt.Println("	Error! Pilihan anda tidak valid!")
-		}
-	case "5":
-		fmt.Println("Mau mengurutkan Nama dari apa dulu nih : ")
-		fmt.Println("1.	Ascending(A->Z)")
-		fmt.Println("2.	Descending(Z->A)")
-		var pi string
-		fmt.Scan(&pi)
-		switch pi {
-		case "1":
-			InsertionSortNamaAscending(&arrPeminjam,countPeminjam)
-			fmt.Println("Data diurutkan berdasarkan Nama dari A ke Z(Ascending).")
-		case "2":
-			InsertionSortNamaDescendig(&arrPeminjam,countPeminjam)
-			fmt.Println("Data diurutkan berdasarkan Nama dari Z ke A(Descending).")
-		default:
-			fmt.Println("	Error! Pilihan anda tidak valid!")
-		}
-	default:
-		fmt.Println("  Error! Pilihan tidak valid.")
-		enter()
-		return
-	}
-	allTable()
 	enter()
 }
 
@@ -952,7 +813,6 @@ func Laporan() {
 	enter()
 }
 
-
 func cetakJudul() {
 	judul := []string{
 		`________          __                                   ______   __                               `,
@@ -988,7 +848,6 @@ func cetakJudul() {
 		fmt.Println(warna[i%len(warna)] + baris + "\033[0m")
 	}
 }
-
 
 func main() {
 	for {
