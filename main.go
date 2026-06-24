@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"strings"
 )
 
 const MAXVAL int = 1000
@@ -33,7 +34,6 @@ var countPeminjam int = 0
 func LoadData() {
 	file, err := os.ReadFile(JSON)
 	if err != nil {
-		// langsung return,karena file baru dibuat
 		if os.IsNotExist(err) {
 			return
 		}
@@ -41,7 +41,7 @@ func LoadData() {
 		return
 	}
 
-	//json.Unmarshal fungsinya untuk membuka file dari Go dan mengin
+	//json.Unmarshal fungsinya untuk membuka file dari Go dan mengisi data-data ke struct
 	var tempSlice []Pinjaman
 	err = json.Unmarshal(file, &tempSlice)
 	if err != nil {
@@ -56,19 +56,17 @@ func LoadData() {
 	}
 }
 
-// SaveData berfungsi menyimpan array aktif ke dalam file JSON
 func SaveData() {
-	// Kita hanya mengambil data yang sudah terisi berdasarkan countPeminjam
 	dataAktif := arrPeminjam[:countPeminjam]
 
-	// Menggunakan MarshalIndent agar format JSON di file terlihat rapi (mudah dibaca manusia)
+	// Menggunakan MarshalIndent agar format JSON di file terlihat rapih
 	fileJSON, err := json.MarshalIndent(dataAktif, "", "  ")
 	if err != nil {
 		fmt.Println("Error saat mengubah ke JSON:", err)
 		return
 	}
 
-	// Simpan atau timpa data ke file
+	//simpan ke json
 	err = os.WriteFile(JSON, fileJSON, 0644)
 	if err != nil {
 		fmt.Println("Error saat menyimpan file:", err)
@@ -81,14 +79,14 @@ func TampilkanDataDenganPagination(limit int) {
 		return
 	}
 
-	// Menghitung total halaman murni dengan operasi integer (bentuk bulat)
+	// Menghitung total halaman
 	totalPages := (countPeminjam + limit - 1) / limit
 	currentPage := 1
 
 	for {
 		ClearScreen()
 		garis1()
-		fmt.Printf("  DATA PEMINJAM (Halaman %d dari %d)\n", currentPage, totalPages)	
+		fmt.Printf("  DATA PEMINJAM (Halaman %d dari %d)\n", currentPage, totalPages)
 		garis1()
 
 		TabelHeader()
@@ -122,7 +120,6 @@ func TampilkanDataDenganPagination(limit int) {
 				currentPage--
 			}
 		} else if nav == "Q" || nav == "q" {
-			// Keluar dari perulangan pagination dan kembali ke menu sebelumnya
 			break
 		}
 	}
@@ -656,6 +653,38 @@ func BinarySearch() {
 	} else {
 		fmt.Printf("  Peminjam dengan nama \"%s\" tidak ditemukan.\n", keyword)
 	}
+
+}
+
+func tampilkanBinarySearch(arr dataPeminjam, n int, target string) {
+	idx := binaSearch(arr, n, target)
+	if idx != -1 {
+		fmt.Println("  HASIL BINARY SEARCH")
+		garis1()
+		fmt.Printf("  Peminjam dengan nama \"%s\" tidak ditemukan.\n", arr[idx].Nama)
+	} else {
+		fmt.Println("  Belum ada data peminjam!")
+	}
+	 
+}
+
+func binaSearch(arr dataPeminjam, n int, target string) int {
+	InsertionSort(&arr, n, "Nama", true)
+	left := 0
+	right := n - 1
+	targetLowerCase := strings.ToLower(target)
+	for left <= right {
+		mid := (left + right) / 2
+		midLowerCase := strings.ToLower(arr[mid].Nama)
+		if midLowerCase == targetLowerCase {
+			return mid
+		} else if midLowerCase < target {
+			left = mid + 1
+		} else {
+			right = mid - 1
+		}
+	}
+	return -1
 }
 
 func InsertionSort(arr *dataPeminjam, n int, fieldName string, isAscending bool) {
@@ -678,7 +707,7 @@ func selectionSort(arr *dataPeminjam, n int, fieldName string, isAscending bool)
 		for j := i + 1; j < n; j++ {
 			if Swap(arr, j, minIdx, fieldName, isAscending) {
 				minIdx = j
-			}	
+			}
 		}
 		arr[i], arr[minIdx] = arr[minIdx], arr[i]
 	}
@@ -861,7 +890,10 @@ func MenuSearching() {
 	case "1":
 		SequentialSearch()
 	case "2":
-		BinarySearch()
+		var keyword string
+		fmt.Print("  Masukkan nama peminjam yang dicari : ")
+		fmt.Scan(&keyword)
+		tampilkanBinarySearch(arrPeminjam, countPeminjam, keyword)
 	default:
 		fmt.Println("  Error! Pilihan tidak valid.")
 	}
