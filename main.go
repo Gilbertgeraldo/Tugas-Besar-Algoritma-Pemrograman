@@ -1,11 +1,14 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"math"
+	"os"
 )
 
 const MAXVAL int = 1000
+const JSON = "data_peminjam.json"
 
 type Pinjaman struct {
 	Nama            string
@@ -26,6 +29,104 @@ type dataPeminjam [MAXVAL]Pinjaman
 
 var arrPeminjam dataPeminjam
 var countPeminjam int = 0
+
+func LoadData() {
+	file, err := os.ReadFile(JSON)
+	if err != nil {
+		// langsung return,karena file baru dibuat
+		if os.IsNotExist(err) {
+			return
+		}
+		fmt.Println("Error membaca file:", err)
+		return
+	}
+
+	//json.Unmarshal fungsinya untuk membuka file dari Go dan mengin
+	var tempSlice []Pinjaman
+	err = json.Unmarshal(file, &tempSlice)
+	if err != nil {
+		fmt.Println("Error parsing data JSON:", err)
+		return
+	}
+
+	// Pindahkan data dari slice ke array global arrPeminjam
+	countPeminjam = len(tempSlice)
+	for i := 0; i < countPeminjam; i++ {
+		arrPeminjam[i] = tempSlice[i]
+	}
+}
+
+// SaveData berfungsi menyimpan array aktif ke dalam file JSON
+func SaveData() {
+	// Kita hanya mengambil data yang sudah terisi berdasarkan countPeminjam
+	dataAktif := arrPeminjam[:countPeminjam]
+
+	// Menggunakan MarshalIndent agar format JSON di file terlihat rapi (mudah dibaca manusia)
+	fileJSON, err := json.MarshalIndent(dataAktif, "", "  ")
+	if err != nil {
+		fmt.Println("Error saat mengubah ke JSON:", err)
+		return
+	}
+
+	// Simpan atau timpa data ke file
+	err = os.WriteFile(JSON, fileJSON, 0644)
+	if err != nil {
+		fmt.Println("Error saat menyimpan file:", err)
+	}
+}
+
+func TampilkanDataDenganPagination(limit int) {
+	if countPeminjam == 0 {
+		fmt.Println("  Belum ada data peminjam!")
+		return
+	}
+
+	// Menghitung total halaman murni dengan operasi integer (bentuk bulat)
+	totalPages := (countPeminjam + limit - 1) / limit
+	currentPage := 1
+
+	for {
+		ClearScreen()
+		garis1()
+		fmt.Printf("  DATA PEMINJAM (Halaman %d dari %d)\n", currentPage, totalPages)	
+		garis1()
+
+		TabelHeader()
+
+		// Menentukan batas awal dan akhir indeks data yang akan di-print
+		start := (currentPage - 1) * limit
+		end := start + limit
+		if end > countPeminjam {
+			end = countPeminjam
+		}
+
+		for i := start; i < end; i++ {
+			TabelBaris(arrPeminjam[i], i)
+		}
+		garis1()
+		fmt.Printf("  Menampilkan data ke-%d sampai %d (Total: %d peminjam)\n", start+1, end, countPeminjam)
+		garis2()
+
+		fmt.Println("  Navigasi: [N]ext Page | [P]revious Page | [Q]uit untuk kembali")
+		fmt.Print("  Pilihan Anda (N/P/Q) : ")
+
+		var nav string
+		fmt.Scan(&nav)
+
+		if nav == "N" || nav == "n" {
+			if currentPage < totalPages {
+				currentPage++
+			}
+		} else if nav == "P" || nav == "p" {
+			if currentPage > 1 {
+				currentPage--
+			}
+		} else if nav == "Q" || nav == "q" {
+			// Keluar dari perulangan pagination dan kembali ke menu sebelumnya
+			break
+		}
+	}
+}
 
 func ClearScreen() {
 	//Untuk membersihkan terminal
@@ -222,6 +323,8 @@ func tambahPeminjam() {
 	arrPeminjam[countPeminjam] = p
 	countPeminjam++
 
+	SaveData()
+
 	fmt.Println("\n  === HASIL KALKULASI ===")
 	DetailPeminjaman(p, countPeminjam-1)
 
@@ -316,6 +419,7 @@ func ubahPeminjam() {
 			fmt.Println("  Pilihan tidak valid.")
 		}
 
+		SaveData()
 		fmt.Printf("\n  Data peminjam \"%s\" berhasil diubah!\n", p.Nama)
 		DetailPeminjaman(*p, idx)
 		enter()
@@ -359,6 +463,7 @@ func hapusPeminjam() {
 		arrPeminjam[i] = arrPeminjam[i+1]
 	}
 	countPeminjam--
+	SaveData()
 	fmt.Printf("  Peminjam \"%s\" berhasil dihapus!\n", nama)
 }
 
@@ -573,7 +678,7 @@ func selectionSort(arr *dataPeminjam, n int, fieldName string, isAscending bool)
 		for j := i + 1; j < n; j++ {
 			if Swap(arr, j, minIdx, fieldName, isAscending) {
 				minIdx = j
-			}
+			}	
 		}
 		arr[i], arr[minIdx] = arr[minIdx], arr[i]
 	}
@@ -729,8 +834,7 @@ func MenuSorting() {
 		enter()
 		return
 	}
-	allTable()
-	enter()
+	TampilkanDataDenganPagination(20)
 }
 
 func MenuSearching() {
@@ -809,8 +913,7 @@ func Laporan() {
 	fmt.Printf("    MACET    : %d peminjam\n", cMcet)
 	garis2()
 	fmt.Println("\n  Daftar Semua Peminjam :")
-	allTable()
-	enter()
+	TampilkanDataDenganPagination(20)
 }
 
 func cetakJudul() {
@@ -850,6 +953,7 @@ func cetakJudul() {
 }
 
 func main() {
+	LoadData()
 	for {
 		ClearScreen()
 		cetakJudul()
