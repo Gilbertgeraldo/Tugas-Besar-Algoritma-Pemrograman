@@ -586,6 +586,8 @@ func Swap(arr *dataPeminjam, ins, t int, fieldName string, isAscending bool) boo
 	case "Tenor":
 		status = arr[ins].Tenor < arr[t].Tenor
 	case "Nama":
+		status = strings.ToLower(arr[ins].Nama) < strings.ToLower(arr[t].Nama)
+	case "ID":
 		status = arr[ins].Nama < arr[t].Nama
 	default:
 		return false
