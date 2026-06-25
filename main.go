@@ -413,9 +413,7 @@ func ubahPeminjam() {
 		case "4":
 			p.Status = "MACET"
 		default:
-			fmt.Println("  Pilihan tidak valid.")
-		}
-
+			fmt.Println("  Pilihan tidak valid.") 
 		SaveData()
 		fmt.Printf("\n  Data peminjam \"%s\" berhasil diubah!\n", p.Nama)
 		DetailPeminjaman(*p, idx)
@@ -521,141 +519,6 @@ func SequentialSearch() {
 	}
 }
 
-func BinarySearch() {
-	if countPeminjam == 0 {
-		fmt.Println("  Belum ada data peminjam!")
-		return
-	}
-
-	var temp [1000]Pinjaman
-	for i := 0; i < countPeminjam; i++ {
-		temp[i] = arrPeminjam[i]
-	}
-
-	for i := 1; i < countPeminjam; i++ {
-		key := temp[i]
-
-		keyNamaLower := ""
-		for x := 0; x < len(key.Nama); x++ {
-			c := key.Nama[x]
-			if c >= 'A' && c <= 'Z' {
-				c = c + 32
-			}
-			keyNamaLower += string(c)
-		}
-
-		j := i - 1
-		for j >= 0 {
-			namaJLower := ""
-			for x := 0; x < len(temp[j].Nama); x++ {
-				c := temp[j].Nama[x]
-				if c >= 'A' && c <= 'Z' {
-					c = c + 32
-				}
-				namaJLower += string(c)
-			}
-
-			isGreater := false
-			minLen := len(namaJLower)
-			if len(keyNamaLower) < minLen {
-				minLen = len(keyNamaLower)
-			}
-			for k := 0; k < minLen; k++ {
-				if namaJLower[k] > keyNamaLower[k] {
-					isGreater = true
-					break
-				} else if namaJLower[k] < keyNamaLower[k] {
-					break
-				}
-			}
-			if !isGreater && len(namaJLower) > len(keyNamaLower) {
-				isGreater = true
-			}
-
-			if isGreater {
-				temp[j+1] = temp[j]
-				j--
-			} else {
-				break
-			}
-		}
-		temp[j+1] = key
-	}
-
-	var keyword string
-	fmt.Print("  Masukkan nama peminjam yang dicari : ")
-	fmt.Scan(&keyword)
-
-	keyLower := ""
-	for i := 0; i < len(keyword); i++ {
-		c := keyword[i]
-		if c >= 'A' && c <= 'Z' {
-			c = c + 32
-		}
-		keyLower += string(c)
-	}
-
-	low := 0
-	high := countPeminjam - 1
-	result := -1
-
-	for low <= high {
-		mid := int(math.Floor(float64(low+high) / 2))
-
-		midNamaLower := ""
-		for x := 0; x < len(temp[mid].Nama); x++ {
-			c := temp[mid].Nama[x]
-			if c >= 'A' && c <= 'Z' {
-				c = c + 32
-			}
-			midNamaLower += string(c)
-		}
-
-		cmp := 0
-		minLen := len(midNamaLower)
-		if len(keyLower) < minLen {
-			minLen = len(keyLower)
-		}
-		for k := 0; k < minLen; k++ {
-			if midNamaLower[k] < keyLower[k] {
-				cmp = -1
-				break
-			} else if midNamaLower[k] > keyLower[k] {
-				cmp = 1
-				break
-			}
-		}
-		if cmp == 0 {
-			if len(midNamaLower) < len(keyLower) {
-				cmp = -1
-			} else if len(midNamaLower) > len(keyLower) {
-				cmp = 1
-			}
-		}
-
-		if cmp == 0 {
-			result = mid
-			break
-		} else if cmp < 0 {
-			low = mid + 1
-		} else {
-			high = mid - 1
-		}
-	}
-
-	fmt.Println()
-	garis1()
-	fmt.Println("  HASIL BINARY SEARCH")
-	garis1()
-
-	if result != -1 {
-		DetailPeminjaman(temp[result], result)
-	} else {
-		fmt.Printf("  Peminjam dengan nama \"%s\" tidak ditemukan.\n", keyword)
-	}
-
-}
-
 func tampilkanBinarySearch(arr dataPeminjam, n int, target string) {
 	idx := binaSearch(arr, n, target)
 	if idx != -1 {
@@ -665,20 +528,22 @@ func tampilkanBinarySearch(arr dataPeminjam, n int, target string) {
 	} else {
 		fmt.Println("  Belum ada data peminjam!")
 	}
-	 
+
 }
 
 func binaSearch(arr dataPeminjam, n int, target string) int {
-	InsertionSort(&arr, n, "Nama", true)
 	left := 0
 	right := n - 1
 	targetLowerCase := strings.ToLower(target)
+	
 	for left <= right {
 		mid := (left + right) / 2
 		midLowerCase := strings.ToLower(arr[mid].Nama)
-		if midLowerCase == targetLowerCase {
+		
+		// Menggunakan HasPrefix agar ketik "Agus" bisa mendeteksi "Agus Kusuma"
+		if midLowerCase == targetLowerCase || strings.HasPrefix(midLowerCase, targetLowerCase) {
 			return mid
-		} else if midLowerCase < target {
+		} else if midLowerCase < targetLowerCase { // Typo pembanding target sudah diperbaiki
 			left = mid + 1
 		} else {
 			right = mid - 1
