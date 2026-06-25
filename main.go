@@ -549,6 +549,27 @@ func selectionSort(arr *dataPeminjam, n int, fieldName string, isAscending bool)
 	}
 }
 
+func Swap(arr *dataPeminjam, ins, t int, fieldName string, isAscending bool) bool {
+	var status bool
+	switch fieldName {
+	case "Pinjaman":
+		status = arr[ins].JumlahPinjaman < arr[t].JumlahPinjaman
+	case "Tenor":
+		status = arr[ins].Tenor < arr[t].Tenor
+	case "Nama":
+		status = strings.ToLower(arr[ins].Nama) < strings.ToLower(arr[t].Nama)
+	case "ID":
+		status = arr[ins].Nama < arr[t].Nama
+	default:
+		return false
+	}
+	if isAscending {
+		return status
+	} else {
+		return !status
+	}
+}
+
 func MenuSorting() {
 	ClearScreen()
 	garis1()
